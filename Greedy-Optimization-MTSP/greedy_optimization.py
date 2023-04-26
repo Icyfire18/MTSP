@@ -3,19 +3,23 @@ from math import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 
-class Truck(object):
+class Car(object):
     """
-    Class responsible for checking distance
+    Class responsible for checking distance & driving 
+    towards the target with a distance of 0.2 at a iteration
     """
-    def __init__(self, name):
+    def __init__(self, name, map_size):
+        """
+        Constructor to initialzie when object is called
+        """
         self.name = name
-        self.x = float(random.randint(0, 50))
-        self.y = float(random.randint(0, 50))
+        self.x = float(random.randint(0, map_size))
+        self.y = float(random.randint(0, map_size))
         self.target = None
 
     def drive_to_target(self):
         """
-        Moves self closer to current target
+        Moves self closer to current target for every iteration
         """
         if self.target is None:
             return
@@ -38,25 +42,33 @@ class Truck(object):
 
 
 class Target(object):
-
-    def __init__(self, reached=False):
-        self.x = float(random.randint(0, 50))
-        self.y = float(random.randint(0, 50))
+    """
+    Class responsible to randomize the x and y coordinates of targets
+    """
+    def __init__(self, map_size, reached=False):
+        """
+        Constructor to create class variables and initialize when object is created
+        """
+        self.x = float(random.randint(0, map_size))
+        self.y = float(random.randint(0, map_size))
         self.reached = reached
 
 class Tracker(object):
     """
-    Class responsible for tracking targets & moving trucks 
+    Class responsible for initializing Cars and targets and moving vehicles 
     """
 
-    def __init__(self, no_of_target):
-        self.trucks = [Truck("blue"), Truck("yellow")]
-        self.targets = list(set([Target() for i in range(no_of_target)]))
+    def __init__(self, no_of_target, map_size):
+        """
+        Constructor to initialize cars and their Targets
+        """
+        self.cars = [Car("blue", map_size), Car("yellow", map_size)]
+        self.targets = list(set([Target(map_size) for i in range(no_of_target)]))
         self.job_complete = False
 
-    def move_trucks(self):
+    def move_cars(self):
         """
-        Brute force to find best targets for respective trucks
+        Brute force to find best targets for respective cars
         """
 
         # Check if all targets have been reached
@@ -65,19 +77,20 @@ class Tracker(object):
             self.job_complete = True
             return
 
-        # List of tuples: (truck object, target object, distance)
-        truck_target_distance = []
+        # List of tuples: (car object, target object, distance)
+        car_target_distance = []
 
-        for truck in self.trucks:
+        for car in self.cars:
             for target in unreached_targets:
-                truck_target_distance.append((truck, target, truck.get_distance(target)))
+                car_target_distance.append((car, target, car.get_distance(target)))
 
         # Sort by distance
-        truck_target_distance.sort(key=lambda x: x[2])
+        car_target_distance.sort(key=lambda x: x[2])
 
-        next_moves = truck_target_distance[:1]
+        next_moves = car_target_distance[:1]
 
-        for potential_move in truck_target_distance:
+        # To make sure two cars don't go to the same location
+        for potential_move in car_target_distance:
             if potential_move[0] != next_moves[0][0]:
                 if potential_move[1] != next_moves[0][1]:
                     next_moves.append(potential_move)
@@ -91,10 +104,10 @@ class Tracker(object):
 
 class Vizualize(object):
     """
-    Class responsible for plotting the Targets & movement of Trucks 
+    Class responsible for plotting the Targets & movement of Cars 
     """
 
-    def __init__(self, dispatch):
+    def __init__(self, dispatch, map_size, window_title, super_title, title):
         """
         Takes a Tracker object & plots its current state.
         """
@@ -102,13 +115,16 @@ class Vizualize(object):
 
         # Plot initialization for vizualization
         self.fig, self.ax = plt.subplots()
-        self.ax.set_xlim(-10, 60)
-        self.ax.set_ylim(-10, 60)
+        self.fig.canvas.manager.set_window_title(window_title) 
+        plt.suptitle(super_title)
+        plt.title(title)
+        self.ax.set_xlim(-10, map_size)
+        self.ax.set_ylim(-10, map_size)
 
-        # Trucks represented by points
-        self.points_blue, = self.ax.plot(self.dispatch.trucks[0].x, self.dispatch.trucks[0].y, color='blue', marker='^', linestyle='None')
+        # Cars represented by points
+        self.points_blue, = self.ax.plot(self.dispatch.cars[0].x, self.dispatch.cars[0].y, color='blue', marker='^', linestyle='None')
 
-        self.points_yellow, = self.ax.plot(self.dispatch.trucks[1].x, self.dispatch.trucks[1].y, color='yellow', marker='^', linestyle='None')
+        self.points_yellow, = self.ax.plot(self.dispatch.cars[1].x, self.dispatch.cars[1].y, color='yellow', marker='^', linestyle='None')
 
         # Targets represented by points
         targets_x_coordinates = [target.x for target in self.dispatch.targets]
@@ -120,7 +136,7 @@ class Vizualize(object):
 
     def update(self):
         """
-        Updates plot as trucks move and targets are reached
+        Updates plot as cars move and targets are reached
         """
 
         # Targets Unreached are plotted
@@ -133,9 +149,9 @@ class Vizualize(object):
         targets_reached_y_coordinates = [target.y for target in self.dispatch.targets if target.reached is True]
         self.points_targets_reached.set_data(targets_reached_x_coordinates, targets_reached_y_coordinates)
 
-        # Truck Movements are plotted
-        self.points_blue.set_data(np.cfloat(self.dispatch.trucks[0].x), np.cfloat(self.dispatch.trucks[0].y))
-        self.points_yellow.set_data(np.cfloat(self.dispatch.trucks[1].x), np.cfloat(self.dispatch.trucks[1].y))
+        # Car Movements are plotted
+        self.points_blue.set_data(np.cfloat(self.dispatch.cars[0].x), np.cfloat(self.dispatch.cars[0].y))
+        self.points_yellow.set_data(np.cfloat(self.dispatch.cars[1].x), np.cfloat(self.dispatch.cars[1].y))
 
         # Gap to capture animation
         plt.pause(0.01)
@@ -144,19 +160,29 @@ class Vizualize(object):
 def main():
     """
     1. This is the driver function which is used to control the flow 
-    1. Creates an instance of the Tracker class responsible for tracking targets & moving trucks 
-    2. Creates an instance of the Vizualize class for plotting the Targets & movement of Trucks
-    3. Running in loop to move trucks towards targets until all targets have been reached.
+    1. Creates an instance of the Tracker class responsible for tracking targets & moving cars 
+    2. Creates an instance of the Vizualize class for plotting the Targets & movement of Cars
+    3. Running in loop to move cars towards targets until all targets have been reached.
     """
 
+    ## Initialize vriables
     random.seed(60)
+    map_size = 50
+    window_title = "CARR Productions"
+    super_title = "CS5800 - MTSP - Spring'23 - Geeedy Algorithim"
+    title = "By CARR"
     num_of_cities = int(input("Enter the Number of Cities: "))
-    t = Tracker(num_of_cities)
-    v = Vizualize(t)
 
+    ## Universe creation
+    t = Tracker(num_of_cities, map_size)
+    v = Vizualize(t, map_size+10, window_title, super_title, title)
+
+    ## Loop to run until all the cities have been reached
     while t.job_complete is False:
-        t.move_trucks()
+        t.move_cars()
         v.update()
     
+    ## Freeze the output
     plt.show(block=True)
+
 main()
