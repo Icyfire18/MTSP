@@ -90,11 +90,7 @@ for ant in range(n_ants):
     if tour_leng < best_tour_length:
         best_tour = tour[:-1] # Remove the last (repeated) city
         best_tour_length = tour_leng
-    
-    # Output the paths travelled by the ants in this iteration
- #   print("Iteration", iteration+1, ":")
- #   for ant in range(n_ants):
- #       print("Ant", ant+1, "path:", tours[ant], "Length:", tour_length(tours[ant]))
+
 
 # Print the distance matrix
 print("Distance Matrix:")
@@ -120,14 +116,15 @@ reached_x = []
 reached_y = []
 
 fig, ax = plt.subplots()
-
+fig.canvas.manager.set_window_title("CARR Productions") 
+plt.suptitle("CS5800 - MTSP - Spring'23 - Ant Colony Optimization Algorithim")
+plt.title("By CARR")
 driver, = ax.plot(cities[start,0], cities[start,1], color='blue', marker='^', linestyle='None')
 
 points_targets_unreached, = ax.plot(unreached_x, unreached_y, color="red", marker='o', linestyle='None')
 points_targets_reached, = ax.plot(reached_x, reached_y, color="green", marker='x', linestyle='None')
 
 for i in range(0, len(best_tour)+1):  
-    print(i)
     reached_x.append(cities[i,0])
     reached_y.append(cities[i,1])
     unreached_x.remove(cities[i,0])
@@ -135,6 +132,6 @@ for i in range(0, len(best_tour)+1):
     points_targets_unreached.set_data(unreached_x, unreached_y)
     points_targets_reached.set_data(reached_x, reached_y)
     driver.set_data(cities[i,0], cities[i,1])
-    plt.pause(2)
+    plt.pause(0.80)
   
 plt.show(block=True)
