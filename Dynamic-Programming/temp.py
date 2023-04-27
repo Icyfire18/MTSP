@@ -66,13 +66,9 @@ def solve_mtsp(distances, n, m):
     
     return optimal_path, optimal_length
 
-
 # Take input from the user
-m = int(input("Enter the number of salesmen: "))
+m = 2   ## The number of sales man
 n = int(input("Enter the number of cities: "))
-
-import time
-start_time = time.time()
 
 # Generate random coordinates for cities
 cities = np.random.randint(1, n, size=(n, 2))
@@ -89,8 +85,6 @@ for i in range(n):
 # Solve the MTSP using dynamic programming
 optimal_path, optimal_length = solve_mtsp(distances, n, m)
 
-print("\n\n")
-print("Process finished --- %s seconds ---" % (time.time() - start_time))
 # Print the optimal path and length
 print("Optimal path:", optimal_path)
 print("Optimal length:", optimal_length)
@@ -107,3 +101,36 @@ plt.suptitle(super_title)
 plt.title(title)
 #ax.set_xlim(-10, map_size)
 #ax.set_ylim(-10, map_size)
+print(list(optimal_path[0])[0])
+
+unreached_x_1 = [i[0] for i in cities]
+print(unreached_x_1)
+unreached_y_1 = [i[1] for i in cities]
+print(unreached_y_1)
+reached_x_1 = []
+reached_y_1 = []
+
+
+points_targets_unreached_1, = ax.plot(unreached_x_1, unreached_y_1, color="red", marker='o', linestyle='None')
+points_targets_reached_1, = ax.plot(reached_x_1, reached_y_1, color="green", marker='x', linestyle='None')
+driver_1, = ax.plot(cities[list(optimal_path[0])[0],0], cities[list(optimal_path[0])[0],1], color='blue', marker='^', linestyle='None')
+driver_2, = ax.plot(cities[list(optimal_path[1])[0],0], cities[list(optimal_path[1])[0],1], color='yellow', marker='^', linestyle='None')
+
+for i in range(len(list(optimal_path[0]))):
+    reached_x_1.append(cities[list(optimal_path[0])[i],0])
+    reached_y_1.append(cities[list(optimal_path[0])[i],1])
+    if (cities[list(optimal_path[0])[i],0] in unreached_x_1):
+        unreached_x_1.remove(cities[list(optimal_path[0])[i],0])
+        unreached_y_1.remove(cities[list(optimal_path[0])[i],1])
+    reached_x_1.append(cities[list(optimal_path[1])[i],0])
+    reached_y_1.append(cities[list(optimal_path[1])[i],1])
+    if(cities[list(optimal_path[1])[i],0] in unreached_x_1):
+        unreached_x_1.remove(cities[list(optimal_path[1])[i],0])
+        unreached_y_1.remove(cities[list(optimal_path[1])[i],1])
+    driver_1.set_data(cities[list(optimal_path[0])[i],0], cities[list(optimal_path[0])[i],1])
+    driver_2.set_data(cities[list(optimal_path[1])[i],0], cities[list(optimal_path[1])[i],1])
+    plt.pause(1)
+    print(len(unreached_x_1))
+
+
+plt.show(block=True)

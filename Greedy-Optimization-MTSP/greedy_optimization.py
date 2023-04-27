@@ -154,7 +154,7 @@ class Vizualize(object):
         self.points_yellow.set_data(np.cfloat(self.dispatch.cars[1].x), np.cfloat(self.dispatch.cars[1].y))
 
         # Gap to capture animation
-        plt.pause(0.01)
+        # plt.pause(0.01)
         
 
 def main():
@@ -173,6 +173,11 @@ def main():
     title = "By CARR"
     num_of_cities = int(input("Enter the Number of Cities: "))
 
+    ## Time calcualtion
+    import time
+    start_time = time.time()
+
+
     ## Universe creation
     t = Tracker(num_of_cities, map_size)
     v = Vizualize(t, map_size+10, window_title, super_title, title)
@@ -181,6 +186,8 @@ def main():
     while t.job_complete is False:
         t.move_cars()
         v.update()
+    print("\n\n")
+    print("Process finished --- %s seconds ---" % (time.time() - start_time))
     
     ## Freeze the output
     plt.show(block=True)

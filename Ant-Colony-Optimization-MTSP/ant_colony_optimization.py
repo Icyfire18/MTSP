@@ -4,7 +4,7 @@ import random
 
 # Number of cities (input from user)
 n = int(input("Enter the number of cities per salesman:"))
-
+random.seed(60)
 
 def ant_colony(salesman_no):
 
@@ -123,9 +123,16 @@ def ant_colony(salesman_no):
 
     return cities, best_tour, start 
 
+import time
+start_time = time.time()
+
 
 salesman1_cities, salesman1_best_tour, salesman1_start = ant_colony(0)
 salesman2_cities, salesman2_best_tour, salesman2_start = ant_colony(100)
+
+
+print("\n\n")
+print("Process finished --- %s seconds ---" % (time.time() - start_time))
 
 unreached_x_1 = [i[0] for i in salesman1_cities]
 unreached_y_1 = [i[1] for i in salesman1_cities]
