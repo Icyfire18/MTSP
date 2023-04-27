@@ -154,7 +154,7 @@ class Vizualize(object):
         self.points_yellow.set_data(np.cfloat(self.dispatch.cars[1].x), np.cfloat(self.dispatch.cars[1].y))
 
         # Gap to capture animation
-        # plt.pause(0.01)
+        plt.pause(0.01)
         
 
 def main():
